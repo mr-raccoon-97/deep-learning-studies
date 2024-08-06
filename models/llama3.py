@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import torch
 from torch import Tensor
 from torch import exp
+from torch import arange, outer
 from torch import polar, ones_like
 from torch import zeros, repeat_interleave
 from torch import view_as_complex, view_as_real
@@ -31,8 +32,6 @@ class RMSNorm(Module):
     def forward(self, input: Tensor) -> Tensor:
         output = self.norm(input.float()).type_as(input)
         return output * self.weight
-    
-from torch import arange, outer
     
 def precompute_complex_positional_embeddings(model_dimension: int, sequence_lenght_limit: int, scaling_factor: float = 10000.0) -> Tensor:
     frequencies = Tensor(sequence_lenght_limit, model_dimension // 2)
