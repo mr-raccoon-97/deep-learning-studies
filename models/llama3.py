@@ -198,9 +198,10 @@ class Transformer(Module):
 
         mask = None
         if sequence_lenght > 1:
-            mask = ones(sequence_lenght, sequence_lenght, dtype=torch.bool)
+            mask = ones(sequence_lenght, sequence_lenght)
             mask = mask.triu(diagonal=1)
-            mask = hstack([zeros(sequence_lenght, start_position, dtype=torch.bool), mask]).to(tokens.device)
+            mask = hstack([zeros(sequence_lenght, start_position), mask]).to(tokens.device)
+            
         for layer in self.layers:
             sequence = layer(sequence, start_position, positional_embeddings, mask)
         

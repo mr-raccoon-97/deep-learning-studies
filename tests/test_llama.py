@@ -271,9 +271,4 @@ def test_transformer(fairscale_init):
         output2 = itransformer(x, 0)
 
         assert output.shape == output2.shape
-        
-        print("first")
-        print(output)
-        print("second")
-        print(output2)
-        assert torch.allclose(output, output2, atol=1e-1)
+        assert torch.allclose(output, output2, atol=1e-4)
