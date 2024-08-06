@@ -32,29 +32,13 @@ class RMSNorm(Module):
         output = self.norm(input.float()).type_as(input)
         return output * self.weight
     
-### TO SLOW FOR TESTING.
-###
-###def precompute_complex_positional_embeddings(model_dimension: int, sequence_lenght_limit: int, scaling_factor: float = 10000.0) -> Tensor:
-###    frequencies = Tensor(sequence_lenght_limit, model_dimension // 2)
-###    for dimension in range(model_dimension // 2):
-###        frequencies[:, dimension] = - 2 * dimension / model_dimension * math.log(scaling_factor)
-###        frequencies[:, dimension] = exp(frequencies[:, dimension])
-###        for sequence in range(sequence_lenght_limit):
-###            frequencies[sequence, dimension] = sequence * frequencies[sequence, dimension]
-##    return polar(ones_like(frequencies), frequencies)
-##
-## Using llama's repo one
-
-
+from torch import arange, outer
+    
 def precompute_complex_positional_embeddings(model_dimension: int, sequence_lenght_limit: int, scaling_factor: float = 10000.0) -> Tensor:
-    freqs = 1.0 / (scaling_factor ** (torch.arange(0, model_dimension, 2)[: (model_dimension // 2)].float() / model_dimension))
-    t = torch.arange(sequence_lenght_limit, device=freqs.device, dtype=torch.float32)
-    freqs = torch.outer(t, freqs)
-    freqs_cis = torch.polar(torch.ones_like(freqs), freqs)  # complex64
-    return freqs_cis
-
-
-###########
+    frequencies = Tensor(sequence_lenght_limit, model_dimension // 2)
+    frequencies = exp(- arange(0, model_dimension, 2) * math.log(scaling_factor) / model_dimension)
+    frequencies = outer(arange(sequence_lenght_limit), frequencies)
+    return polar(ones_like(frequencies), frequencies)
 
 def split(sequence: Tensor, number_of_heads: int) -> Tensor:
     batch_size, sequence_length, model_dimension = sequence.shape
